@@ -1,10 +1,10 @@
 # Servidor multimedia y fotográfico privado con Immich
 
-## 1. Descripción
+## 1. Descripción del proyecto
 
-Proyecto de ASIR para desplegar un servidor multimedia y fotográfico privado utilizando Immich sobre Debian y Docker.
+Proyecto de ASIR para desplegar un servidor multimedia y fotográfico privado utilizando **Immich**, **Debian** y **Docker Compose**.
 
-El objetivo es disponer de una plataforma propia para almacenar, gestionar y visualizar fotografías y vídeos desde diferentes dispositivos.
+El objetivo es disponer de una plataforma propia para almacenar, gestionar y visualizar fotografías y vídeos desde diferentes dispositivos, manteniendo el control sobre los datos personales.
 
 ## 2. Tecnologías utilizadas
 
@@ -15,30 +15,51 @@ El objetivo es disponer de una plataforma propia para almacenar, gestionar y vis
 - PostgreSQL
 - Valkey
 - Git y GitHub
+- Bash
 
-## 3. Requisitos previos
+## 3. Estructura del repositorio
 
-Para instalar el proyecto se necesita:
+```text
+servidor-fotografico-inmich/
+├── README.md
+├── .gitignore
+├── scripts/
+│   └── install.sh
+└── inmich/
+    ├── docker-compose.yaml
+    ├── .env.example
+    ├── .env
+    ├── data/
+    └── postgres/
+```
 
-- Un servidor Debian.
+**Nota:** Las carpetas `data/` y `postgres/` almacenan los datos locales de Immich y no se suben a GitHub. Se crean durante la instalación. El archivo `.env` contiene información privada y tampoco se sube al repositorio.
+
+## 4. Requisitos previos
+
+Para desplegar el proyecto se necesita:
+
+- Un servidor con Debian.
 - Docker instalado y funcionando.
-- Docker Compose disponible mediante `docker compose`.
+- Docker Compose disponible mediante el comando `docker compose`.
 - Git instalado.
 - Conexión a Internet.
 - Espacio suficiente para almacenar fotografías y vídeos.
 
-## 4. Instalación e inicio del proyecto
+## 5. Instalación y despliegue
+
+El proyecto incluye un script de instalación automática que comprueba los requisitos, prepara los directorios necesarios y arranca los servicios de Immich.
 
 ### Paso 1. Clonar el repositorio
 
 ```bash
-git clone URL_DEL_REPOSITORIO
+git clone https://github.com/vjp-ferminph/servidor-fotografico-inmich.git
 ```
 
-### Paso 2. Entrar en el directorio
+### Paso 2. Entrar en el directorio del proyecto
 
 ```bash
-cd servidor-fotografico-inmich/immich
+cd servidor-fotografico-inmich
 ```
 
 ### Paso 3. Crear el archivo de configuración
@@ -46,34 +67,55 @@ cd servidor-fotografico-inmich/immich
 Copiar el archivo de ejemplo:
 
 ```bash
-cp .env.example .env
+cp inmich/.env.example inmich/.env
 ```
 
 Editar la configuración:
 
 ```bash
-nano .env
+nano inmich/.env
 ```
 
-Modificar especialmente la contraseña de PostgreSQL y las rutas de almacenamiento.
+Cambiar especialmente `DB_PASSWORD` por una contraseña segura propia.
 
-### Paso 4. Iniciar los servicios
+**Importante:** El archivo `.env` contiene información privada y no debe subirse a GitHub.
 
-Desde el directorio `immich`, ejecutar:
+### Paso 4. Dar permisos al instalador
 
 ```bash
-docker compose up -d
+chmod +x scripts/install.sh
 ```
 
-Este comando descarga las imágenes necesarias y arranca los contenedores.
+### Paso 5. Ejecutar la instalación automática
 
-### Paso 5. Comprobar el funcionamiento
+Desde la raíz del repositorio:
 
 ```bash
+./scripts/install.sh
+```
+
+El script realizará las siguientes operaciones:
+
+- Comprobar que Docker está instalado.
+- Comprobar que Docker Compose está disponible.
+- Localizar el archivo `docker-compose.yaml`.
+- Comprobar que existe el archivo `.env`.
+- Crear los directorios `data/` y `postgres/`.
+- Comprobar el acceso al servicio Docker.
+- Iniciar los contenedores mediante Docker Compose.
+
+### Paso 6. Comprobar el funcionamiento
+
+Desde el directorio del proyecto, ejecutar:
+
+```bash
+cd inmich
 docker compose ps
 ```
 
-### Paso 6. Acceder a Immich
+Los servicios deberían aparecer en estado `Up`. Los que tengan comprobación de salud también deberían llegar a mostrar `healthy`.
+
+### Paso 7. Acceder a Immich
 
 Abrir un navegador y acceder a:
 
@@ -81,9 +123,15 @@ Abrir un navegador y acceder a:
 http://IP_DEL_SERVIDOR:2283
 ```
 
-La primera vez aparecerá la pantalla de bienvenida y registro del administrador.
+Si se accede desde el propio servidor, también se puede utilizar:
 
-## 5. Servicios desplegados
+```text
+http://localhost:2283
+```
+
+En el primer acceso aparecerá la pantalla de bienvenida para crear la cuenta de administrador.
+
+## 6. Servicios desplegados
 
 | Servicio | Función |
 |---|---|
@@ -92,41 +140,59 @@ La primera vez aparecerá la pantalla de bienvenida y registro del administrador
 | PostgreSQL | Base de datos |
 | Valkey | Gestión de tareas en segundo plano |
 
-## 6. Gestión de los servicios
+## 7. Gestión de los servicios
 
-Iniciar:
+Los siguientes comandos deben ejecutarse desde el directorio `inmich`.
+
+**Iniciar los servicios:**
 
 ```bash
 docker compose up -d
 ```
 
-Detener:
+**Detener los servicios:**
 
 ```bash
 docker compose down
 ```
 
-Ver los contenedores:
+**Consultar el estado:**
 
 ```bash
 docker compose ps
 ```
 
-Consultar los registros:
+**Consultar los registros:**
 
 ```bash
 docker compose logs -f
 ```
 
-## 7. Seguridad
+**Reiniciar los servicios:**
 
-- No publicar contraseñas en GitHub.
+```bash
+docker compose restart
+```
+
+La orden `docker compose down` detiene y elimina los contenedores, pero conserva los datos persistentes. No utilizar `docker compose down -v` salvo que se quiera eliminar también los volúmenes.
+
+## 8. Seguridad y protección de datos
+
+- No publicar contraseñas ni credenciales en GitHub.
 - No subir el archivo `.env`.
-- No almacenar fotografías privadas en el repositorio.
+- No almacenar fotografías ni vídeos personales en el repositorio.
+- Mantener las carpetas de datos fuera del control de versiones.
 - Restringir el acceso al servidor a la red autorizada.
-- Realizar copias de seguridad periódicas.
+- Realizar copias de seguridad periódicas de los archivos multimedia y de la base de datos.
+- No exponer directamente el servicio a Internet sin implementar las medidas de seguridad adecuadas.
 
-## 8. Autores
+## 9. Autores
 
 - Fermín Pérez Herrero
 - Oliver Sanchez Calza
+
+## 10. Repositorio
+
+Proyecto disponible en GitHub:
+
+https://github.com/vjp-ferminph/servidor-fotografico-inmich
