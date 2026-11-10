@@ -127,59 +127,8 @@ En el primer acceso aparecerá la pantalla de bienvenida para crear la cuenta de
 | PostgreSQL | Base de datos |
 | Valkey | Gestión de tareas en segundo plano |
 
-## 7. Gestión de los servicios
-
-Los siguientes comandos deben ejecutarse desde el directorio `inmich`.
-
-**Iniciar los servicios:**
-
-```bash
-docker compose up -d
-```
-
-**Detener los servicios:**
-
-```bash
-docker compose down
-```
-
-**Consultar el estado:**
-
-```bash
-docker compose ps
-```
-
-**Consultar los registros:**
-
-```bash
-docker compose logs -f
-```
-
-**Reiniciar los servicios:**
-
-```bash
-docker compose restart
-```
-
-La orden `docker compose down` detiene y elimina los contenedores, pero conserva los datos persistentes. No utilizar `docker compose down -v` salvo que se quiera eliminar también los volúmenes.
-
-## 8. Seguridad y protección de datos
-
-- No publicar contraseñas ni credenciales en GitHub.
-- No subir el archivo `.env`.
-- No almacenar fotografías ni vídeos personales en el repositorio.
-- Mantener las carpetas de datos fuera del control de versiones.
-- Restringir el acceso al servidor a la red autorizada.
-- Realizar copias de seguridad periódicas de los archivos multimedia y de la base de datos.
-- No exponer directamente el servicio a Internet sin implementar las medidas de seguridad adecuadas.
-
-## 9. Autores
+## 7. Autores
 
 - Fermín Pérez Herrero
 - Oliver Sanchez Calza
 
-## 10. Repositorio
-
-Proyecto disponible en GitHub:
-
-https://github.com/vjp-ferminph/servidor-fotografico-inmich
