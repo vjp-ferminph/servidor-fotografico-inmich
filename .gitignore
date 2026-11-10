@@ -1,0 +1,26 @@
+# Credenciales y configuración privada
+.env
+.env.*
+!.env.example
+
+# Datos personales y multimedia
+*.jpg
+*.jpeg
+*.png
+*.mp4
+*.mov
+*.db
+
+# Copias de seguridad
+backups/
+*.bak
+
+# Claves privadas
+*.pem
+*.key
+id_rsa
+id_ed25519
+
+# Archivos temporales
+*.log
+.DS_Store
