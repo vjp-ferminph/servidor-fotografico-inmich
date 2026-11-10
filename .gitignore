@@ -3,6 +3,10 @@
 .env.*
 !.env.example
 
+# Datos multimedia y base de datos
+data/
+postgres/
+
 # Datos personales y multimedia
 *.jpg
 *.jpeg

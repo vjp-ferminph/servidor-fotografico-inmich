@@ -1,0 +1,113 @@
+
+# Nombre del proyecto Docker Compose
+name: immich
+
+# Definición de los servicios que componen el servidor fotográfico
+services:
+
+  # --------------------------------------------------
+  # SERVIDOR PRINCIPAL DE IMMICH
+  # --------------------------------------------------
+  immich-server:
+    # Nombre identificativo del contenedor
+    container_name: immich_server
+
+    # Imagen oficial del servidor Immich
+    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-v3}
+
+    # Directorios y archivos que se montan dentro del contenedor
+    volumes:
+      # Almacenamiento persistente de fotografías y vídeos
+      - ${UPLOAD_LOCATION}:/data
+
+      # Sincronización de la hora del contenedor con Debian
+      - /etc/localtime:/etc/localtime:ro
+
+    # Carga las variables de configuración desde el archivo .env
+    env_file:
+      - .env
+
+    # Puerto para acceder a la interfaz web de Immich
+    ports:
+      - "2283:2283"
+
+    # Servicios que necesita para funcionar
+    depends_on:
+      - redis
+      - database
+
+    # Reinicia el contenedor automáticamente salvo que se detenga manualmente
+    restart: unless-stopped
+
+  # --------------------------------------------------
+  # SERVICIO DE MACHINE LEARNING
+  # --------------------------------------------------
+  immich-machine-learning:
+    # Nombre identificativo del contenedor
+    container_name: immich_machine_learning
+
+    # Imagen oficial de procesamiento inteligente de Immich
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-v3}
+
+    # Almacenamiento de modelos de inteligencia artificial
+    volumes:
+      - model-cache:/cache
+
+    # Carga las variables de configuración desde .env
+    env_file:
+      - .env
+
+    # Reinicio automático del contenedor
+    restart: unless-stopped
+
+  # --------------------------------------------------
+  # SERVICIO REDIS / VALKEY
+  # --------------------------------------------------
+  redis:
+    # Nombre identificativo del contenedor
+    container_name: immich_redis
+
+    # Imagen de Valkey, compatible con Redis
+    image: docker.io/valkey/valkey:9
+
+    # Reinicio automático del contenedor
+    restart: unless-stopped
+
+  # --------------------------------------------------
+  # BASE DE DATOS POSTGRESQL
+  # --------------------------------------------------
+  database:
+    # Nombre identificativo del contenedor
+    container_name: immich_postgres
+
+    # Imagen de PostgreSQL preparada para Immich
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
+
+    # Variables de configuración de PostgreSQL
+    environment:
+      # Contraseña de acceso a la base de datos
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+      # Usuario de la base de datos
+      POSTGRES_USER: ${DB_USERNAME}
+
+      # Nombre de la base de datos
+      POSTGRES_DB: ${DB_DATABASE_NAME}
+
+      # Habilita comprobaciones de integridad de datos
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+
+    # Directorio persistente donde PostgreSQL almacena sus datos
+    volumes:
+      - ${DB_DATA_LOCATION}:/var/lib/postgresql/data
+
+    # Reinicio automático del contenedor
+    restart: unless-stopped
+
+# --------------------------------------------------
+# VOLÚMENES PERSISTENTES DE DOCKER
+# --------------------------------------------------
+volumes:
+  # Almacena en caché los modelos de Machine Learning
+  # para evitar descargarlos cada vez que se inicia el servicio
+  model-cache:
