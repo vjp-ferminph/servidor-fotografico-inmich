@@ -2,7 +2,7 @@
 
 ## 1. Descripción del proyecto
 
-Proyecto de ASIR para desplegar un servidor multimedia y fotográfico privado utilizando **Immich**, **Debian** y **Docker Compose**.
+Proyecto para desplegar un servidor multimedia y fotográfico privado utilizando **Immich**, **Debian** y **Docker Compose**.
 
 El objetivo es disponer de una plataforma propia para almacenar, gestionar y visualizar fotografías y vídeos desde diferentes dispositivos, manteniendo el control sobre los datos personales.
 
@@ -14,8 +14,6 @@ El objetivo es disponer de una plataforma propia para almacenar, gestionar y vis
 - Immich
 - PostgreSQL
 - Valkey
-- Git y GitHub
-- Bash
 
 ## 3. Estructura del repositorio
 
@@ -104,18 +102,7 @@ El script realizará las siguientes operaciones:
 - Comprobar el acceso al servicio Docker.
 - Iniciar los contenedores mediante Docker Compose.
 
-### Paso 6. Comprobar el funcionamiento
-
-Desde el directorio del proyecto, ejecutar:
-
-```bash
-cd inmich
-docker compose ps
-```
-
-Los servicios deberían aparecer en estado `Up`. Los que tengan comprobación de salud también deberían llegar a mostrar `healthy`.
-
-### Paso 7. Acceder a Immich
+### Paso 6. Acceder a Immich
 
 Abrir un navegador y acceder a:
 
